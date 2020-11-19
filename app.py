@@ -10,9 +10,6 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-import plotly.offline as pyo
-pyo.init_notebook_mode() # ensures that the plotly graphics convert to HTML
-
 # ----------
 
 # Read in the data
