@@ -151,29 +151,18 @@ app.layout = html.Div(
         html.H2('Income stratified by grouped levels of job prestige'),
         dcc.Graph(figure=fig_facet),
         
-        html.Div([
+        html.H3('Pick the variables you would like to view!'), 
+        dcc.Graph(id='graph'),
             
-            html.H3('Select the x-axis'),   
-            dcc.Dropdown(id='x-axis',
-            options=[{'label': i, 'value': i} for i in x_cols],
-            value='male_breadwinner'),
+        html.H3('Select the x-axis'),   
+        dcc.Dropdown(id='x-axis',
+        options=[{'label': i, 'value': i} for i in x_cols],
+        value='male_breadwinner'),
             
-            html.H3('Select the grouping variable'),       
-            dcc.Dropdown(id='group',
-            options=[{'label': i, 'value': i} for i in grp_cols],
-            value='sex')
-        
-         ], style={'width': '30%', 
-                   'float': 'left', 
-                   'backgroundColor': colors['background']}),
-        
-        html.Div([
-            
-            html.H3('Pick the variables you would like to view!'), 
-            dcc.Graph(id='graph')
-        
-         ], style={'width': '70%', 'float': 'right', 
-                   'backgroundColor': colors['background']}),
+        html.H3('Select the grouping variable'),       
+        dcc.Dropdown(id='group',
+        options=[{'label': i, 'value': i} for i in grp_cols],
+        value='sex')
         
     ]
 )
