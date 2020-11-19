@@ -117,7 +117,8 @@ def update_layout(fig):
 [update_layout(i) for i in [fig_scatter, fig_box1, fig_box2, fig_facet]]
 
 # Initialize the dashboard
-app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 # Build the dashboard
 app.layout = html.Div(
