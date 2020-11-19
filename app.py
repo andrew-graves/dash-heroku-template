@@ -10,8 +10,6 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-# ----------
-
 # Read in the data
 gss = pd.read_csv('https://github.com/jkropko/DS-6001/raw/master/localdata/gss2018.csv',
                  encoding='cp1252', na_values=['IAP','IAP,DK,NA,uncodeable', 'NOT SURE',
@@ -50,7 +48,10 @@ gss_disp = gss_clean.groupby('sex')[
     ['income', 'job_prestige', 'socioeconomic_index', 'education']
 ].mean().reset_index().round(2)
 
-# Build the table
+# Clean up column names for display
+gss_disp.columns = map(lambda x: str(x).replace('_', ' ').title(), gss_disp.columns)
+
+# Show the table
 table = ff.create_table(gss_disp)
 
 # ----------
@@ -58,7 +59,9 @@ table = ff.create_table(gss_disp)
 # Build the scatter plot
 fig_scatter = px.scatter(gss_clean, x='job_prestige', y='income', color='sex', 
                          trendline='ols', hover_data=['education', 'socioeconomic_index'],
-                         labels={'job_prestige': 'Occupational Prestige', 'income': 'Annual Income'})
+                         labels={'job_prestige': 'Occupational Prestige', 
+                                 'income': 'Annual Income',
+                                 'sex': 'Sex'})
 
 # ----------
 
@@ -100,57 +103,76 @@ x_cols = ['satjob', 'relationship', 'male_breadwinner',
           'men_bettersuited', 'child_suffer', 'men_overwork']
 grp_cols = ['sex', 'region', 'education']
 
+# Specify background and text colors
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+
+# Update the layout
+def update_layout(fig):
+    return fig.update_layout(plot_bgcolor=colors['background'],
+                             paper_bgcolor=colors['background'],
+                             font_color=colors['text'])
+[update_layout(i) for i in [fig_scatter, fig_box1, fig_box2, fig_facet]]
+
 # Initialize the dashboard
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-server = app.server
+app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
 
 # Build the dashboard
 app.layout = html.Div(
-    [
-        html.H1('insert title here'),
+    style={'backgroundColor': colors['background'], 
+           'textAlign': 'center',
+           'color': colors['text']},
+    children=[
+        
+        html.H1('Exploration of the General Social Survey'),
         dcc.Markdown(children = markdown_text),
         
-        html.H2('table title here'),
+        html.H2('Summary statistics across the sexes'),
         dcc.Graph(figure=table),
         
-        html.H2('scatter title here'),
+        html.H2('Income and prestige are positively correlated'),
         dcc.Graph(figure=fig_scatter),
         
         html.Div([
             
-            html.H2('box 1 here'),
+            html.H2('Job outcome distributions'),
             dcc.Graph(figure=fig_box1)
          ], style = {'width':'48%', 'float':'left'}),
         
         html.Div([
             
-            html.H2('box 2 here'),
+            html.H2('red: female; blue: male'),
             dcc.Graph(figure=fig_box2)
          ], style = {'width':'48%', 'float':'right'}),
         
-        html.H2('facet title here'),
+        html.H2('Income stratified by grouped levels of job prestige'),
         dcc.Graph(figure=fig_facet),
         
         html.Div([
             
-            html.H3('x-axis feature'),   
+            html.H3('Select the x-axis'),   
             dcc.Dropdown(id='x-axis',
             options=[{'label': i, 'value': i} for i in x_cols],
             value='male_breadwinner'),
             
-            html.H3('groups'),       
+            html.H3('Select the grouping variable'),       
             dcc.Dropdown(id='group',
             options=[{'label': i, 'value': i} for i in grp_cols],
             value='sex')
         
-         ], style={'width': '25%', 'float': 'left'}),
+         ], style={'width': '30%', 
+                   'float': 'left', 
+                   'backgroundColor': colors['background']}),
         
         html.Div([
             
-            #html.H2('box here'),
+            html.H3('Pick the variables you would like to view!'), 
             dcc.Graph(id='graph')
         
-         ], style={'width': '70%', 'float': 'right'}),
+         ], style={'width': '70%', 'float': 'right', 
+                   'backgroundColor': colors['background']}),
         
     ]
 )
@@ -164,7 +186,7 @@ def make_figure(x, grp):
     gss_bar = gss_clean[[grp, x]].value_counts().reset_index().rename(
         {0: 'Count'}, axis=1)
         
-    return px.bar(gss_bar, x=x, y='Count', color=grp, barmode='group')
+    return update_layout(px.bar(gss_bar, x=x, y='Count', color=grp, barmode='group'))
 
 # Run the dashboard
 if __name__ == '__main__':
