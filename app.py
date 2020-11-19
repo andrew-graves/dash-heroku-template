@@ -171,4 +171,4 @@ def make_figure(x, grp):
 
 # Run the dashboard
 if __name__ == '__main__':
-    app.run_server(debug=False, port=8503, host='0.0.0.0')
+    app.run_server(debug=True)
