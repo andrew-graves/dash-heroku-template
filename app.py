@@ -144,8 +144,11 @@ app.layout = html.Div(
            'color': colors['text']},
     children=[
         
-        html.H1('Exploration of the Gender Wage Gap Using the General Social Survey (GSS)'),
-        dcc.Markdown(children = markdown_text),
+        html.Div([
+            
+            html.H1('Exploration of the Gender Wage Gap Using the General Social Survey (GSS)'),
+            dcc.Markdown(children = markdown_text),
+         ], style={'textAlign': 'left'}),
         
         html.H2('Summary statistics across the sexes'),
         dcc.Graph(figure=table),
