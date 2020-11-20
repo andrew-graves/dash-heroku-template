@@ -39,20 +39,37 @@ gss_clean.age = gss_clean.age.replace({'89 or older':'89'})
 gss_clean.age = gss_clean.age.astype('float')
 
 # Text describing the dashboard
-markdown_text = 'insert md text here'
+markdown_text = '''There is a well-documented gender wage gap in American society, such that men tend to make more money than
+women ([source here](https://en.wikipedia.org/wiki/Gender_pay_gap)). On average, women make approximately 79% the amount that 
+men do. After adjusting for work time, type of occupation, education, and experience, the wage gap is less stark at 95%. 
+On average, the gender wage gap decreased steadily across the 20th century. However, research suggests that the gender wage 
+gap may not fully close until 2109! This report will explore the gender wage gap from various angles by visualizing several 
+factors that are important for differences in pay across individuals in general.
+
+The General Social Survey (GSS; [source here](http://www.gss.norc.org/About-The-GSS)) includes responses 
+on a variety of items, such as demographics, attitudes, and job outcomes to name a few. The survey has been conducted since 
+1972 and has two primary goals:
+
+- Conduct basic research on the development of American society
+- Distribute high-quality data to social scientists and various stakeholders
+
+The GSS has a methodological report which contains over 124 papers, in order to advance survey research methodology. For these 
+reasons, the GSS is considered to be one of the best resources for scientifically examining the sociological dynamics of the 
+United States of America. Here we will be using this rich dataset to explore the gender wage gap in American society.''' 
 
 # ----------
 
 # Group by sex and compute means on select columns
-gss_disp = gss_clean.groupby('sex')[
+gss_tab = gss_clean.groupby('sex')[
     ['income', 'job_prestige', 'socioeconomic_index', 'education']
-].mean().reset_index().round(2)
+].mean().reset_index().round(2).rename({'education': 'years of education'}, axis=1)
 
 # Clean up column names for display
-gss_disp.columns = map(lambda x: str(x).replace('_', ' ').title(), gss_disp.columns)
+gss_tab.columns = map(lambda x: str(x).replace('_', ' ').title(), gss_tab.columns)
 
 # Show the table
-table = ff.create_table(gss_disp)
+table = ff.create_table(gss_tab)
+table.show()
 
 # ----------
 
@@ -127,7 +144,7 @@ app.layout = html.Div(
            'color': colors['text']},
     children=[
         
-        html.H1('Exploration of the General Social Survey'),
+        html.H1('Exploration of the Gender Wage Gap Using the General Social Survey (GSS)'),
         dcc.Markdown(children = markdown_text),
         
         html.H2('Summary statistics across the sexes'),
@@ -140,13 +157,13 @@ app.layout = html.Div(
             
             html.H2('Job outcome distributions'),
             dcc.Graph(figure=fig_box1)
-         ], style = {'width':'48%', 'float':'left'}),
+         ], style = {'width':'50%', 'float':'left'}),
         
         html.Div([
             
             html.H2('red: female; blue: male'),
             dcc.Graph(figure=fig_box2)
-         ], style = {'width':'48%', 'float':'right'}),
+         ], style = {'width':'50%', 'float':'right'}),
         
         html.H2('Income stratified by grouped levels of job prestige'),
         dcc.Graph(figure=fig_facet),
